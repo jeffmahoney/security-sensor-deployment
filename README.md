@@ -43,6 +43,8 @@ Source: SUSE built container
 
 This is the same container as the frontend but started in client mode.  This is mostly for convenience to ensure that the UI presents the client events interface immediately without needing to start up an external client.
 
+Once the server has been configured it is safe to remove this container.
+
 ### Zookeeper (2)
 
 Source: Bitnami (VMWare) built container
@@ -218,6 +220,10 @@ The artifacts used for client monitoring are the primary purpose of this tool. U
 To begin, select a label group. It is possible to create arbitrary labels and add them to subsets of hosts, but for now we'll just choose "All" and then choose "Select Artifacts" at the bottom of the pane.
 
 Select the required artifacts. The list should match what we've configured in the `Kafka.Events.Clients` artifact parameters above, ignoring anything following the `/` character as that delimits the _data source_ and we don't care about that for the client artifact. Although some of these artifacts have configurable parameters, the defaults generally do not need to be changed. Click through the rest of the buttons in the bar at the bottom until you complete the process by using the "Launch" button. This will push the new configuration to the endpoints and the new policy will take effect.
+
+## Client Deployment
+
+Packages for deployment on a number of SUSE Linux releases are available on the [Open Build Service](https://download.opensuse.org/repositories/security:/sensor/). The `config/client.conf.template` file (with the correct `server_url`) should be installed at `/etc/velociraptor/client.config`.  The packages will otherwise create the correct directories to host the writeback and buffer files.
 
 ## Bugs / Caveats
 
