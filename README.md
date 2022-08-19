@@ -4,7 +4,6 @@
 
 This document is intended to be a short guide to deploying the Linux Security Sensor.  It is almost certainly incomplete but will cover most of the basics.  If you encounter difficulties or there are inaccuracies, please contact the development team.
 
-
 ## Architecture
 
 The Linux Security Sensor is designed to collect events and respond to queries from a central server. Each step in the communication process is intended to be reliable  in the event of a component or network becoming unavailable. The client will cache up to 1GB of events before dropping them. The [Velociraptor](https://docs.velociraptor.app/) server does not have a built-in concept of data passthrough so we use multiple [Kafka](https://kafka.apache.org/) brokers to store-and-forward messages to Humio. The [Kafka-Humio Gateway](https://github.com/SUSE/linux-security-sensor/tree/sensor-base-0.6.4/contrib/kafka-humio-gateway) acts as a consumer of the Kafka messages, formats, and forwards them to Humio for later consumption by the IT Security team.
@@ -76,15 +75,17 @@ The `traefik`container is used to implement a TLS reverse proxy capable of obtai
 
 Most of the configuration of the containers is done in the containers themselves and need little outside configuration. Still, there are site specific values to be defined. There are example configuration files in the Git repository that will make this easier. Copying the examples and editing them is the simplest way to proceed.. The main Velociraptor configuration file will be automatically generated but will still need to be completed for the site.
 
-`env.example` -> `.env` -- Defines compose variables
-`config/kafka-humio-gateway/kafka-humio-gateway.yml.example` -> `config/kafka-humio-gateway/kafka-humio-
-gateway.yml`
-`config/traefik/traefik.toml.example` -> `config/traefik/traefik.toml`
+- `env.example` -> `.env` -- Defines compose variables
 
-`config/velociraptor/server.conf` -- Created by Velociraptor container but needs completion,
+- `config/kafka-humio-gateway/kafka-humio-gateway.yml.example` -> `config/kafka-humio-gateway/kafka-humio-gateway.yml`
 
-`config/traefik/acme.json` -- Empty file will be filled in by the Traefik container. No further modification is required.
-`config/velociraptor/client.conf.template` -- Created by Velociraptor container for use with clients.  The server URL will need to be completed.
+- `config/traefik/traefik.toml.example` -> `config/traefik/traefik.toml`
+
+- `config/velociraptor/server.conf` -- Created by Velociraptor container but needs completion,
+
+- `config/traefik/acme.json` -- Empty file will be filled in by the Traefik container. No further modification is required.
+
+- `config/velociraptor/client.conf.template` -- Created by Velociraptor container for use with clients.  The server URL will need to be completed.
 
 ### Internal TLS
 
@@ -129,7 +130,9 @@ An example `humio-kafka-gateway.yml` file is provided as `config/humio-kafka-gat
 An example `traefik.toml` file is provided as `config/traefik/traefik.toml.example`. Several values must be filled in and the resultant file installed in `config/traefik/traefik.toml`.
 
 - Email Address
+
 - Domain (without the host component)
+
 - The URL for the ACME interface of the CA to be used to issue certificates for this host
 
 If the CA you configure is not otherwise connected to a public chain of trust, the root certificate for the CA must be added to the system's certificate store first. Otherwise, registration will fail with an untrusted certificate error.
@@ -148,45 +151,64 @@ The artifacts used for server monitoring include monitoring incoming events and 
 
 Select the following artifacts to configure in the next screen.
 
-- `Kafka.Events.Clients`
-	This artifact is responsible for listening to _all_ of the incoming events to the Velociraptor server and forwarding events from the selected artifacts to the Kafka cluster.
-		The following parameters must be used:
-		- `kafkaBrokerAddresses` -> `kafka-1:9092,kafka-2:9092,kafka-3:9092`
-		- `kafkaTopics` -> `velociraptor-events`
-		- `tagFields` -> `Artifact`
+#### `Kafka.Events.Clients`
+This artifact is responsible for listening to _all_ of the incoming events to the Velociraptor server and forwarding events from the selected artifacts to the Kafka cluster.
+The following parameters must be used:
+
+- `kafkaBrokerAddresses` -> `kafka-1:9092,kafka-2:9092,kafka-3:9092`
+
+- `kafkaTopics` -> `velociraptor-events`
+
+- `tagFields` -> `Artifact`
 
 Then select the required artifacts to forward to Kafka. These parameters may be updated at any time. When a new artifact is added to the system, it will not be forwarded automatically until it is added to the list of artifacts to forward.
 
 A good starting set would be:
-	- `Generic.Client.Stats`
-	- `Linux.Events.ExecutableFiles`
-	- `Linux.Events.NewFiles`
-	- `Linux.Events.ProcessExecutions`
-	- `Linux.Events.ProcessStatuses`
-	- `Linux.Events.UserAccount`
-	- `Server.Monitor.Shell`
-	- `SUSE.Linux.Events.Crontab/Connections`
-	- `SUSE.Linux.Events.DNS/Connections`
-	- `SUSE.Linux.Events.ImmutableFile/Connections`
-	- `SUSE.Linux.Events.SSHLogin`
-	- `SUSE.Linux.Events.Tcp/Connections`
-	- `SUSE.Linux.Events.UserGroupMembershipUpdates`
+- `Generic.Client.Stats`
+
+- `Linux.Events.ExecutableFiles`
+
+- `Linux.Events.NewFiles`
+
+- `Linux.Events.ProcessExecutions`
+
+- `Linux.Events.ProcessStatuses`
+
+- `Linux.Events.UserAccount`
+
+- `Server.Monitor.Shell`
+
+- `SUSE.Linux.Events.Crontab/Connections`
+
+- `SUSE.Linux.Events.DNS/Connections`
+
+- `SUSE.Linux.Events.ImmutableFile/Connections`
+
+- `SUSE.Linux.Events.SSHLogin`
+
+- `SUSE.Linux.Events.Tcp/Connections`
+
+- `SUSE.Linux.Events.UserGroupMembershipUpdates`
 
 These artifacts may in turn need configuration, which will be described below.
 
-- `Kafka.Flows.Upload`
-	This artifact is responsible for listening to all incoming flows to the Velociraptor server and forwarding them to the Kafka cluster.
+#### `Kafka.Flows.Upload`
+This artifact is responsible for listening to all incoming flows to the Velociraptor server and forwarding them to the Kafka cluster.
 
-		The following parameters must be used:
-		- `kafkaBrokerAddresses` -> `kafka-1:9092,kafka-2:9092,kafka-3:9092`
-		- `kafkaTopics` -> `velociraptor-events`
-		- `tagFields` -> `Artifact`
-		- `ArtifactNameRegex` -> `.`
+The following parameters must be used:
 
-- `Server.Monitor.Shell`
+- `kafkaBrokerAddresses` -> `kafka-1:9092,kafka-2:9092,kafka-3:9092`
+
+- `kafkaTopics` -> `velociraptor-events`
+
+-  `tagFields` -> `Artifact`
+
+- `ArtifactNameRegex` -> `.`
+
+#### `Server.Monitor.Shell`
 This artifact is responsible for logging the output of remote shell sessions and is an important component of the audit trail.  There is no configuration required.
 
-- `System.Hunt.Creation`
+#### `System.Hunt.Creation`
 This artifact generates an event when a user of the GUI initiates a new hunt.
 
 ### Client Event Monitoring
