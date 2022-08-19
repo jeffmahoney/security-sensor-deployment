@@ -41,9 +41,7 @@ The hostname and ports defined in the `sensor-frontend` block must match the one
 
 Source: SUSE built container
 
-This is the same container as the frontend but started in client mode.  This is mostly for convenience to ensure that the UI presents the client events interface immediately without needing to start up an external client.
-
-Once the server has been configured it is safe to remove this container.
+This is the same container as the frontend but started in client mode.  This is for convenience to ensure that the UI presents the client events interface immediately without needing to start up an external client.  The client running inside a container will not have access to a number of resource including BPF and the audit netlink socket.  It also cannot accept remote shell commands.  Once the server has been configured it is safe to remove this container.
 
 ### Zookeeper (2)
 
