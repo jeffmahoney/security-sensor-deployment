@@ -1,0 +1,9 @@
+*~
+.*sw?
+.vim*
+.env
+config/traefik/traefik.toml
+config/kafka-humio-gateway/kafka-humio-gateway.yml
+config/velociraptor/*
+data/velociraptor/*
+logs/velociraptor/*
