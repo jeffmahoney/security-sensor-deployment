@@ -81,11 +81,13 @@ Most of the configuration of the containers is done in the containers themselves
 
 - `config/traefik/traefik.toml.example` -> `config/traefik/traefik.toml`
 
-- `config/velociraptor/server.conf` -- Created by Velociraptor container but needs completion,
+- `config/velociraptor/server.conf` -- Created by Velociraptor container but needs completion.
+
+- `config/velociraptor/client.conf` -- Created by Velociraptor client container.  No further modification is required.
+
+- `config/velociraptor/client.conf.template` -- Created by Velociraptor container for use with clients.  The server URL will need to be replaced with the real domain name of the deployed server.
 
 - `config/traefik/acme.json` -- Empty file will be filled in by the Traefik container. No further modification is required.
-
-- `config/velociraptor/client.conf.template` -- Created by Velociraptor container for use with clients.  The server URL will need to be completed.
 
 ### Internal TLS
 
