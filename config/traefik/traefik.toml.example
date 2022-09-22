@@ -22,7 +22,7 @@ exposedByDefault = false
 
 [acme]
 email = "$EMAILADDRESS"
-storage = "acme.json"
+storage = "/certs/acme.json"
 entryPoint = "https"
 OnHostRule = true
 caServer = "https://$CAFQDN/acme/$DOMAIN/directory"

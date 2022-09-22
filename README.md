@@ -87,8 +87,6 @@ Most of the configuration of the containers is done in the containers themselves
 
 - `config/velociraptor/client.conf.template` -- Created by Velociraptor container for use with clients.  The server URL will need to be replaced with the real domain name of the deployed server.
 
-- `config/traefik/acme.json` -- Empty file will be filled in by the Traefik container. No further modification is required.
-
 ### Internal TLS
 
 Internal TLS has yet to be implemented and will require some changes to the sections below. What follows is what is required to use the Compose environment with _external_ TLS only.

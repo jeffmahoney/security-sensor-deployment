@@ -2,6 +2,7 @@
 version: '3'
 
 volumes:
+  traefik-certs:
   kafka-1-data:
   kafka-2-data:
   kafka-3-data:
@@ -23,7 +24,7 @@ services:
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./config/traefik/acme.json:/acme.json
+      - traefik-certs:/certs
       - ./config/traefik/traefik.toml:/etc/traefik/traefik.toml
       - /var/lib/ca-certificates/ca-bundle.pem:/etc/ssl/certs/ca-certificates.crt:ro
     restart: unless-stopped
