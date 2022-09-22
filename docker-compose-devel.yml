@@ -1,0 +1,39 @@
+---
+version: '3'
+
+services:
+  traefik:
+    command: # Single-value options must be completely specified again
+      - "--log.level=DEBUG"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.caserver=${ACME_SERVER}"
+      - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.storage=/certs/acme.json"
+      - "--entrypoints.develsecure.address=:3000"
+    ports:
+      - "3000:3000"
+  sensor-frontend:
+    environment:
+      - VELOCIRAPTOR_DISABLE_CSRF=1
+  sensor-devel:
+    image: sensor-devel:latest
+    depends_on:
+      - sensor-frontend
+    volumes:
+      - ${VELOCIRAPTOR_GIT_DIR}/gui/velociraptor:/app
+    labels:
+      traefik.enable: true
+      traefik.http.routers.develtls.tls.certresolver: myresolver
+      traefik.http.routers.develtls.rule: "Host(`${SENSOR_GUI_HOSTNAME}`)"
+      traefik.http.routers.develtls.entrypoints: develsecure
+      traefik.http.routers.develtls.tls: true
+      traefik.http.services.frontend-devel.loadbalancer.server.port: 3000
+      traefik.http.services.frontend-devel.loadbalancer.passhostheader: true
+    restart:
+      unless-stopped

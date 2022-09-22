@@ -12,7 +12,15 @@ In many deployments, the Velocirpator server is the interface used to consume th
 
 ## Docker Compose
 
-There is a template `docker-compose.yml` contained in this repository. The defaults should be generally sane for a test deployment but work still needs to be done to use TLS within the container. For now, the traffic between containers is unencrypted but isolated within the network created for this compose environment.  The `docker-compose.yml` file can be used as-is but the user must copy `env.sample` to `.env` and fill in the missing values.
+There is a template `docker-compose.yml` contained in this repository. The defaults should be generally sane for a test deployment but work still needs to be done to use TLS within the container. For now, the traffic between containers is unencrypted but isolated within the network created for this compose environment.  The `docker-compose.yml` file can be used as-is but the user must copy `env.sample` to `.env` and fill in the missing values.  There is also a `docker-compose-devel.yml` file that starts up the GUI on port 3000 directly from the source repository.
+
+To start the compose environment normally:
+
+	$ docker-compose up -d
+
+To start in developer mode:
+
+	$ docker-compose -f docker-compose.yml -f docker-compose-devel.yml up -d
 
 ### Sensor Frontend
 
@@ -35,7 +43,15 @@ This container exposes four ports, each of which are configurable within the `se
 	- Port 8001
 	- This is the internal gRPC endpoint and does not need to be exposed to the network unless the server is operating in a large environment where multiple frontend servers are required.
 
-The hostname and ports defined in the `sensor-frontend` block must match the ones used in the `server.conf` file.
+The hostname and ports defined in the `sensor-frontend` block must match the ones used in the `server.conf` file.  By default, the only port exposed to the network is port 8000 since clients must connect to it directly to use its internal CA.
+
+### Sensor GUI (Developer mode)
+
+Source: Local source repository
+
+The `sensor-devel` container holds the GUI interface that starts directly from the source repository.  It is not optimized and required disabling cookie security to operate properly.  It is meant for developer use only and is only started if the additional `docker-compose-devel.yml` file is specified on the `docker-compose` command line.
+
+It exposes its interface on port 3000 and requires additional configuration in `gui/velociraptor/src/setupProxy.js` found in the source directory to point to the hostname running the frontend.  Developers must log into the "real" GUI prior to using the developer interface.
 
 ### Sensor Client
 
