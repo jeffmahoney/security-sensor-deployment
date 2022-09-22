@@ -35,8 +35,6 @@ services:
       - ZOO_SERVER_PASSWORDS=${KAFKA_ZOOKEEPER_PASSWORD}
       - ZOO_CLIENT_USER=${KAFKA_ZOOKEEPER_USER}
       - ZOO_CLIENT_PASSWORD=${KAFKA_ZOOKEEPER_PASSWORD}
-        #    volumes:
-        #      - ./data/zookeeper-1:/bitnami/zookeeper
     volumes:
       - zookeeper-1-data:/bitnami/zookeeper
     restart:
@@ -51,7 +49,6 @@ services:
       - ZOO_CLIENT_PASSWORD=${KAFKA_ZOOKEEPER_PASSWORD}
     volumes:
       - zookeeper-2-data:/bitnami/zookeeper
-        #      - ./data/zookeeper-2:/bitnami/zookeeper
     restart:
       unless-stopped
   kafka-1:
