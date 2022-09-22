@@ -68,6 +68,7 @@ services:
       - KAFKA_ZOOKEEPER_USER=${KAFKA_ZOOKEEPER_USER}
       - KAFKA_ZOOKEEPER_PASSWORD=${KAFKA_ZOOKEEPER_PASSWORD}
       - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_ZOOKEEPER_PROTOCOL=SASL
     volumes:
      - kafka-1-data:/bitnami/kafka
     restart:
@@ -86,6 +87,7 @@ services:
       - KAFKA_ZOOKEEPER_USER=${KAFKA_ZOOKEEPER_USER}
       - KAFKA_ZOOKEEPER_PASSWORD=${KAFKA_ZOOKEEPER_PASSWORD}
       - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_ZOOKEEPER_PROTOCOL=SASL
     volumes:
      - kafka-2-data:/bitnami/kafka
     restart:
@@ -104,6 +106,7 @@ services:
       - KAFKA_ZOOKEEPER_USER=${KAFKA_ZOOKEEPER_USER}
       - KAFKA_ZOOKEEPER_PASSWORD=${KAFKA_ZOOKEEPER_PASSWORD}
       - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_ZOOKEEPER_PROTOCOL=SASL
     volumes:
      - kafka-3-data:/bitnami/kafka
     restart:
