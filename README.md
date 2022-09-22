@@ -79,8 +79,6 @@ Most of the configuration of the containers is done in the containers themselves
 
 - `config/kafka-humio-gateway/kafka-humio-gateway.yml.example` -> `config/kafka-humio-gateway/kafka-humio-gateway.yml`
 
-- `config/traefik/traefik.toml.example` -> `config/traefik/traefik.toml`
-
 - `config/velociraptor/server.conf` -- Created by Velociraptor container but needs completion.
 
 - `config/velociraptor/client.conf` -- Created by Velociraptor client container.  No further modification is required.
@@ -127,13 +125,11 @@ An example `humio-kafka-gateway.yml` file is provided as `config/humio-kafka-gat
 
 ### Traefik
 
-An example `traefik.toml` file is provided as `config/traefik/traefik.toml.example`. Several values must be filled in and the resultant file installed in `config/traefik/traefik.toml`.
+Traefik is to used to act as a TLS reverse proxy and it will obtain its certificates automatically via ACME.  The following fields must be properly set in `.env`:
 
-- Email Address
+- `ACME_EMAIL`: Email Address for ACME registration
 
-- Domain (without the host component)
-
-- The URL for the ACME interface of the CA to be used to issue certificates for this host
+- `ACME_SERVER`: The URL for the ACME interface of the CA to be used to issue certificates for this host.  It defaults to the Let's Encrypt staging server and the URL for the production server is provided.  To use a local ACME server, provide the appropriate URL.
 
 If the CA you configure is not otherwise connected to a public chain of trust, the root certificate for the CA must be added to the system's certificate store first. Otherwise, registration will fail with an untrusted certificate error.
 

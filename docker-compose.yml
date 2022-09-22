@@ -12,20 +12,27 @@ volumes:
 
 services:
   traefik:
-    image: traefik:v1.7
+    image: traefik:v2.8
     container_name: traefik
     hostname: traefik
-    command: |-
-      --logLevel=DEBUG
-      --web
-      --entrypoints='Name:http Address::80 Redirect.EntryPoint:https Redirect.Permanent:true'
+    command: # Please make sure that changes are reflected in docker-compose-devel.yml too
+      - "--log.level=DEBUG"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.caserver=${ACME_SERVER}"
+      - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.storage=/certs/acme.json"
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - traefik-certs:/certs
-      - ./config/traefik/traefik.toml:/etc/traefik/traefik.toml
       - /var/lib/ca-certificates/ca-bundle.pem:/etc/ssl/certs/ca-certificates.crt:ro
     restart: unless-stopped
   zookeeper-1:
@@ -136,11 +143,17 @@ services:
       - ./logs/velociraptor:/logs
     labels:
       traefik.enable: "true"
-      traefik.frontend.passHostHeader: "true"
-      traefik.frontend.rule: "Host: ${SENSOR_GUI_HOSTNAME}"
-      traefik.port: 8889
-      # Once we figure out internal cert management
-      # traefik.gui.protocol: https
+      traefik.http.routers.frontend.rule: "Host(`${SENSOR_GUI_HOSTNAME}`)"
+      traefik.http.routers.frontend.entrypoints: web
+      traefik.http.routers.frontend.middlewares: https_redirect
+      traefik.http.routers.frontendtls.rule: "Host(`${SENSOR_GUI_HOSTNAME}`)"
+      traefik.http.routers.frontendtls.entrypoints: websecure
+      traefik.http.routers.frontendtls.tls: true
+      traefik.http.routers.frontendtls.tls.certresolver: myresolver
+      traefik.http.middlewares.https_redirect.redirectscheme.scheme: https
+      traefik.http.middlewares.https_redirect.redirectscheme.permanent: true
+      traefik.http.services.frontend.loadbalancer.server.port: 8889
+      traefik.http.services.frontend.loadbalancer.passhostheader: true
     restart:
       unless-stopped
   sensor-client:
