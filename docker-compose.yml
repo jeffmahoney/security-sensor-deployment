@@ -36,6 +36,7 @@ services:
       - /var/lib/ca-certificates/ca-bundle.pem:/etc/ssl/certs/ca-certificates.crt:ro
     restart: unless-stopped
   zookeeper-1:
+    container_name: zookeeper-1
     image: 'bitnami/zookeeper:3.8.0'
     environment:
       - ZOO_ENABLE_AUTH=yes
@@ -43,11 +44,14 @@ services:
       - ZOO_SERVER_PASSWORDS=${KAFKA_ZOOKEEPER_PASSWORD}
       - ZOO_CLIENT_USER=${KAFKA_ZOOKEEPER_USER}
       - ZOO_CLIENT_PASSWORD=${KAFKA_ZOOKEEPER_PASSWORD}
+      - ZOO_SERVER_ID=1
+      - ZOO_SERVERS=zookeeper-1:2888:3888::1,zookeeper-2:2888:3888::2
     volumes:
       - zookeeper-1-data:/bitnami/zookeeper
     restart:
       unless-stopped
   zookeeper-2:
+    container_name: zookeeper-2
     image: 'bitnami/zookeeper:3.8.0'
     environment:
       - ZOO_ENABLE_AUTH=yes
@@ -55,11 +59,14 @@ services:
       - ZOO_SERVER_PASSWORDS=${KAFKA_ZOOKEEPER_PASSWORD}
       - ZOO_CLIENT_USER=${KAFKA_ZOOKEEPER_USER}
       - ZOO_CLIENT_PASSWORD=${KAFKA_ZOOKEEPER_PASSWORD}
+      - ZOO_SERVER_ID=2
+      - ZOO_SERVERS=zookeeper-1:2888:3888::1,zookeeper-2:2888:3888::2
     volumes:
       - zookeeper-2-data:/bitnami/zookeeper
     restart:
       unless-stopped
   kafka-1:
+    container_name: kafka-1
     image: 'bitnami/kafka:3.1.1'
     depends_on:
       - zookeeper-1
@@ -79,6 +86,7 @@ services:
     restart:
       unless-stopped
   kafka-2:
+    container_name: kafka-2
     image: 'bitnami/kafka:3.1.1'
     depends_on:
       - zookeeper-1
@@ -98,6 +106,7 @@ services:
     restart:
       unless-stopped
   kafka-3:
+    container_name: kafka-3
     image: 'bitnami/kafka:3.1.1'
     depends_on:
       - zookeeper-1
@@ -117,6 +126,7 @@ services:
     restart:
       unless-stopped
   kafka-humio-gateway:
+    container_name: kafka-humio-gateway
     image: registry.opensuse.org/security/sensor/containers/linux-security-sensor-kafka-humio-gateway:latest
     depends_on:
       - kafka-1
